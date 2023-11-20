@@ -17,7 +17,6 @@ app.use(cors());
 // main code start
 // --------------------------------------------------------------------
 
-
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.g3vskme.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -39,13 +38,24 @@ async function run() {
         //===========================================================================//
 
         // GET COLLECTION IN MONGODB DATA BASE;
-
+        const usersCollection = client.db("baraibunia-high-school-database").collection("users");
         const classCollection = client.db("baraibunia-high-school-database").collection("class");
 
 
+        // users related code;
+        app.post('/users', async (req, res) => {
+            const savUser = req.body;
+            const query = { email: savUser.email };
+            const existingUser = await usersCollection.findOne(query);
+            if (existingUser) {
+                return res.send('user already exist');
+            }
+            const result = await usersCollection.insertOne(savUser);
+            res.send(result);
+        });
 
 
-
+        
         // class related code;
         app.post('/class', async (req, res) => {
             const newClass = req.body;
@@ -75,15 +85,9 @@ async function run() {
 }
 run().catch(console.dir);
 
-
 // --------------------------------------------------------------------
 // main code end
 // --------------------------------------------------------------------
-
-
-
-
-
 
 
 
